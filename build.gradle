@@ -1,0 +1,73 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'net.minecrell.licenser' version '0.4.1'
+}
+
+final def DEBUG = true
+final def basePackage = 'me.dkim19375.itemrenamepreventor.libs'
+
+group = 'me.dkim19375'
+version = '1.0-SNAPSHOT'
+
+shadowJar {
+    if (!DEBUG) {
+        relocate("kotlin", "${basePackage}.kotlin")
+        relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
+    }
+}
+
+license {
+    header = rootProject.file("LICENSE")
+    include "**/*.kt"
+}
+
+repositories {
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url = 'https://jitpack.io' }
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    implementation 'com.github.dkim19375:dkim19375Core:3.0.2'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        expand 'pluginVersion': version
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+task removeBuildJars() {
+    new File('build/libs').deleteDir()
+}
+
+task copyFile(type: Copy) {
+    if (!new File('../.TestServers/1.16/plugins/').exists()) {
+        return
+    }
+    new File('../.TestServers/1.16/plugins/' + project.name + '-' + project.version + '-all.jar').delete()
+    from('build/libs/' + project.name + '-' + project.version + '-all.jar')
+    into('../.TestServers/1.16/plugins')
+    include('*.jar')
+}
+
+task deleteAll() {
+    for (File file : new File('../.TestServers/1.16/plugins').listFiles()) {
+        if (file.name.startsWith(project.name)) {
+            file.delete()
+        }
+    }
+    for (File file : new File('../.TestServers/1.8/plugins').listFiles()) {
+        if (file.name.startsWith(project.name)) {
+            file.delete()
+        }
+    }
+}

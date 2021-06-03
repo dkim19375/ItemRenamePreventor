@@ -1,0 +1,6 @@
+main: me.dkim19375.itemrenamepreventor.ItemRenamePreventor
+name: ItemRenamePreventor
+version: ${pluginVersion}
+description: A plugin to prevent renaming of lored items
+author: dkim19375
+api-version: 1.16
